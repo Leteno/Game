@@ -35,9 +35,15 @@ def show(matrix):
                 answer = item.posibility[0]
                 line += '? '
             elif item.isFliped:
-                line += '%s ' % item.posibility
+                if DEBUG:
+                    line += '%s ' % item.posibility
+                else:
+                    line += '%s ' % item.posibility[0]
             else:
-                line += '%s  ' % item.posibility
+                if DEBUG:
+                    line += '%s ' % item.posibility
+                else:
+                    line += '  '
         print(line)
     print('answer is %s' % answer)
 
@@ -138,3 +144,8 @@ class Item:
 
     def hasOneSolution(self):
         return not self.isFliped and len(self.posibility) == 1
+
+
+if __name__ == '__main__':
+    matrix = gen(5, 1)
+    show(matrix)
