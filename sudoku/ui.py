@@ -9,22 +9,6 @@ BLACK = (  0,   0,   0)
 WHITE = (255, 255, 255)
 WINDOWWIDTH, WINDOWHEIGHT = 550, 400
 
-def show(matrix):
-    answer = None
-    for row in matrix.getData():
-        line = ''
-        for item in row:
-            if not answer and item.hasOneSolution():
-                answer = item.posibility[0]
-                line += '? '
-            elif item.isFliped:
-                assert len(item.posibility) == 1, 'strange item: %s' % item
-                line += '%s ' % item.posibility[0]
-            else:
-                line += '  '
-        print(line)
-    print('answer is %s' % answer)
-
 def main():
     pygameScene()
 

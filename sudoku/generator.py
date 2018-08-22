@@ -1,6 +1,8 @@
 
 import random, time
 
+DEBUG = False
+
 def gen(n, difficulty = 3):
     '''
     generate a quiz metrix of n x n
@@ -10,11 +12,13 @@ def gen(n, difficulty = 3):
 
     count = 0
     while not matrix.hasSolution(difficulty) and count < 100:
-        show(matrix)
+        if DEBUG:
+            show(matrix)
         count += 1
         matrix.flipOne()
         safty = 0
-        print('elapsing: %s' % (time.time() - last))
+        if DEBUG:
+            print('elapsing: %s' % (time.time() - last))
         last = time.time()
         while matrix.proving() and safty < 1000:
             safty += 1
@@ -82,7 +86,8 @@ class Matrix:
             # It is perfect, nothing need to be done
             return False
         i, j, item = m
-        print('improving %s %s' % (i, j))
+        if DEBUG:
+            print('improving %s %s' % (i, j))
         num = item.posibility[0]
         item.markAsImproved()
 
@@ -128,7 +133,8 @@ class Item:
         self.isFliped = True
         index = random.randint(0, len(self.posibility) - 1)
         self.posibility = [ self.posibility[index] ]
-        print('flip as %s', self.posibility)
+        if DEBUG:
+            print('flip as %s', self.posibility)
 
     def hasOneSolution(self):
         return not self.isFliped and len(self.posibility) == 1
