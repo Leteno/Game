@@ -31,10 +31,10 @@ Shape.prototype.draw = function(ctx) {
     y = this.py - halfSize;
 
     if (this.hide) {
-	old = ctx.fillStyle;
+	ctx.save();
 	ctx.fillStyle = 'blue'
 	ctx.fillRect(x, y, currentSize, currentSize);
-	ctx.fillStyle = old;
+	ctx.restore();
     } else {
 	
 	index = this.type % imageInstances.length;
@@ -51,10 +51,10 @@ Shape.prototype.draw = function(ctx) {
 	    ctx.beginPath();
 	    ctx.arc(x0, y0, radius, 0, Math.PI * 2, true);
 	    ctx.closePath();
-	    old = ctx.fillStyle;
+	    ctx.save();
 	    ctx.fillStyle = 'red'
 	    ctx.fill();
-	    ctx.fillStyle = old
+	    ctx.restore();
 	}
     }
 };
