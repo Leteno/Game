@@ -6,17 +6,27 @@ canvas = document.getElementById('canvas');
 reloadBtn = document.getElementById('reload');
 ctx = canvas.getContext('2d');
 
+boardOffsetX = 20; boardOffsetY = 20;
+
 var raf;
 
 function main() {
 
     reloadBtn.onclick = onReload;
+    canvas.onclick = onCanvasClick;
 
     raf = requestAnimationFrame(draw);
 }
 
 function onReload() {
-    board.flip(random(N), random(N));
+    board.switchState();
+}
+
+function onCanvasClick(event) {
+    if (board.onclick(event.clientX - boardOffsetX, event.clientY - boardOffsetY)) {
+	// resolve by board
+	return true;
+    }
 }
 
 
@@ -25,7 +35,7 @@ function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     ctx.save();
-    ctx.translate(20, 20);
+    ctx.translate(boardOffsetX, boardOffsetY);
     board.draw(ctx);
     ctx.restore();
 

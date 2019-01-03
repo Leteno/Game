@@ -3,26 +3,60 @@
 function Board(n, chessSize = 40) {
     // n x n chessboard
     this.n = n;
+    this.chessSize = chessSize;
 
-    gap = 20;
-    x0 = 0; y0 = 0;
 
+    this.STATE_NONE = 0;
+    this.STATE_SELECTING = 1;
+    this.state = this.STATE_NONE;
+
+
+    this.gap = 20;
+    this.x0 = 0;
+    this.y0 = 0;
     this.matrix = [];
     for (var r = 0; r < n; r++) {
 	for (var c = 0; c < n; c++) {
-	    x = x0 + c * (chessSize + gap);
-	    y = y0 + r * (chessSize + gap);
-	    type = random(n);
+	    var xy = this.getXY(r, c);
+	    var x = xy[0], y = xy[1];
+	    var type = random(n);
 	    this.matrix.push(new Shape(x, y, chessSize, type));
 	}
     }
 }
 
+Board.prototype.getXY = function(row, col) {
+    var x = this.x0 + col * (this.chessSize + this.gap);
+    var y = this.y0 + row * (this.chessSize + this.gap);
+    return [x, y];
+};
+
+Board.prototype.getShapeFromXY = function(x, y) {
+    var col = Math.floor((x - this.x0) / (this.chessSize + this.gap));
+    var row = Math.floor((y - this.y0) / (this.chessSize + this.gap));
+    var fromX = this.x0 + col * (this.chessSize + this.gap);
+    var fromY = this.y0 + row * (this.chessSize + this.gap);
+    var toX = fromX + this.chessSize, toY = fromY + this.chessSize;
+    if (collision(fromX, fromY, toX, toY, x, y)) {
+	return this.getShape(row, col);
+    }
+    return null;
+};
+
+Board.prototype.getShape = function(row, col) {
+    var index = row * this.n + col;
+    if (index >= this.matrix.length) {
+	debugger;
+    }
+
+    return this.matrix[index];
+};
+
 Board.prototype.draw = function(ctx) {
     ctx.save();
 
     for (var i = 0; i < this.matrix.length; i++) {
-	obj = this.matrix[i];
+	var obj = this.matrix[i];
 	obj.draw(ctx);
     }
 
@@ -30,18 +64,34 @@ Board.prototype.draw = function(ctx) {
 };
 
 Board.prototype.flip = function(row, col) {
-    index = row * this.n + col;
-    if (index >= this.matrix.length) {
-	debugger;
-    }
 
-    shape = this.matrix[index];
+    var shape = this.getShape(row, col);
     shape.hide = !shape.hide;
 };
 
 Board.prototype.maskAll = function() {
     for (var i = 0; i < this.matrix.length; i++) {
-	shape = this.matrix[i];
+	var shape = this.matrix[i];
 	shape.hide = 1;
+    }
+};
+
+Board.prototype.onclick = function(x, y) {
+    var shape = this.getShapeFromXY(x, y);
+    if (shape === null) {
+	return;
+    }
+    if (this.state == this.STATE_SELECTING) {
+	shape.selected = !shape.selected;
+    } else {
+	shape.hide = !shape.hide;
+    }
+};
+
+Board.prototype.switchState = function() {
+    if (this.state == this.STATE_SELECTING) {
+	this.state = this.STATE_NONE;
+    } else {
+	this.state = this.STATE_SELECTING;
     }
 };
