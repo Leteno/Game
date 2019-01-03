@@ -43,18 +43,34 @@ Shape.prototype.draw = function(ctx) {
 
 	if (this.selected) {
 
-	    radius = 4;
+	    radius = 10;
 	    margin = 4;
 
 	    x0 = x + currentSize - radius - margin;
 	    y0 = y + currentSize - radius - margin;
-	    ctx.beginPath();
-	    ctx.arc(x0, y0, radius, 0, Math.PI * 2, true);
-	    ctx.closePath();
 	    ctx.save();
-	    ctx.fillStyle = 'red'
-	    ctx.fill();
+	    ctx.fillStyle = 'red';
+	    drawHeart(ctx, x0, y0, radius);
 	    ctx.restore();
 	}
     }
 };
+
+function drawHeart(ctx, x, y, size) {
+    ctx.save();
+
+    ratioX = size / 110; ratioY = size / 100;
+
+    ctx.translate(x - 20 * ratioX, y - 20 * ratioY);
+    ctx.beginPath();
+    ctx.moveTo(75* ratioX, 40 * ratioY);
+    ctx.bezierCurveTo(75 * ratioX, 37 * ratioY, 70 * ratioX, 25 * ratioY, 50 * ratioX, 25 * ratioY);
+    ctx.bezierCurveTo(20 * ratioX, 25 * ratioY, 20 * ratioX, 62.5 * ratioY, 20 * ratioX, 62.5 * ratioY);
+    ctx.bezierCurveTo(20 * ratioX, 80 * ratioY, 40 * ratioX, 102 * ratioY, 75 * ratioX, 120 * ratioY);
+    ctx.bezierCurveTo(110 * ratioX, 102 * ratioY, 130 * ratioX, 80 * ratioY, 130 * ratioX, 62.5 * ratioY);
+    ctx.bezierCurveTo(130 * ratioX, 62.5 * ratioY, 130 * ratioX, 25 * ratioY, 100 * ratioX, 25 * ratioY);
+    ctx.bezierCurveTo(85 * ratioX, 25 * ratioY, 75 * ratioX, 37 * ratioY, 75 * ratioX, 40 * ratioY);
+    ctx.fill();
+
+    ctx.restore();
+}
