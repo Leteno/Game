@@ -35,8 +35,11 @@ function onSwap() {
 	if (row1 == row2 && col1 == col2) {
 	    continue;
 	}
-	if (board.swap(row1, col1, row2, col2)) {
-	    console.log('find one');
+	if (board.isAvaliable(row1, col1) && board.isAvaliable(row2, col2)) {
+	    var func = function() {
+		board.swap(row1, col1, row2, col2);
+	    };
+	    board.addJob(func);
 	    break;
 	}
     }

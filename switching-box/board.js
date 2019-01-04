@@ -12,6 +12,7 @@ function Board(n, chessSize = 40) {
 
 
     this.mainQueue = new Queue();
+    this.jobs = [];
 
 
     this.gap = 20;
@@ -57,6 +58,11 @@ Board.prototype.getShape = function(row, col) {
 };
 
 Board.prototype.draw = function(ctx) {
+
+    if (this.jobs.length > 0) {
+	var func = this.jobs.shift();
+	func();
+    }
 
     this.mainQueue.run();
 
@@ -115,6 +121,15 @@ Board.prototype.swap = function(row1, col1, row2, col2) {
     shape2.setMoving(1);
     this.mainQueue.enque(new Swap(shape1, shape2));
     return 1;
+};
+
+Board.prototype.isAvaliable = function(row, col) {
+    var shape = this.getShape(row, col);
+    return !shape.isMoving();
+};
+
+Board.prototype.addJob = function(func) {
+    this.jobs.push(func);
 };
 
 
