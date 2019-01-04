@@ -57,6 +57,15 @@ Board.prototype.getShape = function(row, col) {
     return this.matrix[index];
 };
 
+Board.prototype.getIndexOfShape = function(shape) {
+    for (var i = 0; i < this.matrix.length; i++) {
+	if (this.matrix[i] == shape) {
+	    return i;
+	}
+    }
+    return -1;
+};
+
 Board.prototype.draw = function(ctx) {
 
     if (this.jobs.length > 0) {
@@ -119,7 +128,14 @@ Board.prototype.swap = function(row1, col1, row2, col2) {
     console.log('swaping', row1, col1, 'to', row2, col2);
     shape1.setMoving(1);
     shape2.setMoving(1);
-    this.mainQueue.enque(new Swap(shape1, shape2));
+    var that = this;
+    var onSuccess = function() {
+	var index1 = that.getIndexOfShape(shape1);
+	var index2 = that.getIndexOfShape(shape2);
+	that.matrix[index1] = shape2;
+	that.matrix[index2] = shape1;
+    };
+    this.mainQueue.enque(new Swap(shape1, shape2, onSuccess));
     return 1;
 };
 
@@ -134,7 +150,7 @@ Board.prototype.addJob = function(func) {
 
 
 // speed is pixel per 0.1s
-function Swap(shape1, shape2, speed=10) {
+function Swap(shape1, shape2, onSuccess, speed=10) {
     this.shape1 = shape1;
     this.shape2 = shape2;
     this.speed = speed;
@@ -145,6 +161,7 @@ function Swap(shape1, shape2, speed=10) {
     this.y2 = shape2.py;
 
     this.begin = 0;
+    this.onSuccess = onSuccess;;
 }
 
 Swap.prototype.run = function() {
@@ -178,6 +195,8 @@ Swap.prototype.run = function() {
 
     if (this.shape2.px == this.x1 && this.shape2.py == this.y1 &&
 	this.shape1.px == this.x2 && this.shape1.py == this.y2) {
+
+	this.onSuccess();
 	this.shape1.setMoving(0);
 	this.shape2.setMoving(0);
     }
