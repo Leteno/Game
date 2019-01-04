@@ -21,6 +21,8 @@ function Shape(px, py, size, type) {
     this.py = py;
     this.size = size;
     this.type = type;
+
+    this.moving = 0;
 }
 
 Shape.prototype.draw = function(ctx) {
@@ -53,6 +55,14 @@ Shape.prototype.draw = function(ctx) {
 	    ctx.restore();
 	}
     }
+};
+
+Shape.prototype.isMoving = function() {
+    return this.moving;
+};
+
+Shape.prototype.setMoving = function(moving) {
+    this.moving = moving;
 };
 
 function drawHeart(ctx, x, y, size) {
