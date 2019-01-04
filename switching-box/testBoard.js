@@ -1,5 +1,5 @@
 
-var N = 8;
+var N = 6;
 var board = new Board(N);
 
 canvas = document.getElementById('canvas');

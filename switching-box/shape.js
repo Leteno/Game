@@ -26,9 +26,8 @@ function Shape(px, py, size, type) {
 Shape.prototype.draw = function(ctx) {
     currentSize = this.hide ? this.size : this.size - 2;
 
-    halfSize = currentSize / 2;
-    x = this.px - halfSize;
-    y = this.py - halfSize;
+    x = this.px;
+    y = this.py;
 
     if (this.hide) {
 	ctx.save();

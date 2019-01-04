@@ -12,8 +12,8 @@ function Board(n, chessSize = 40) {
 
 
     this.gap = 20;
-    this.x0 = 0;
-    this.y0 = 0;
+    this.x0 = 20;
+    this.y0 = 20;
     this.matrix = [];
     for (var r = 0; r < n; r++) {
 	for (var c = 0; c < n; c++) {
@@ -37,6 +37,7 @@ Board.prototype.getShapeFromXY = function(x, y) {
     var fromX = this.x0 + col * (this.chessSize + this.gap);
     var fromY = this.y0 + row * (this.chessSize + this.gap);
     var toX = fromX + this.chessSize, toY = fromY + this.chessSize;
+    console.log(fromX, fromY, toX, toY, x, y, col, row);
     if (collision(fromX, fromY, toX, toY, x, y)) {
 	return this.getShape(row, col);
     }
