@@ -2,6 +2,7 @@
 var N = 6;
 var help;
 var board;
+var sound = new Sound();
 var difficulty = new Difficulty();;
 
 var canvas = document.getElementById('canvas');
@@ -138,6 +139,7 @@ function onGameSucceed() {
     board.clearAnimations();
     difficulty.raiseUp();
 
+    sound.playShineAppears();
     showMessage('we are going to make a new map...');
     setTimeout(onStartPicking, 4000);
 }
@@ -204,6 +206,7 @@ function onRightItemPick(item) {
 
     item.hide = 0;
 
+    sound.playCoin();
     if (board.isAllFoundOut()) {
 	onGameSucceed();
     }
@@ -230,4 +233,13 @@ function onWrongItemPick(item) {
     }
 }
 
-main();
+var yes = 0;
+sound.onReady = function() { // ugly
+    yes ++;
+    if (yes >= 1) {
+	main();
+    }
+}
+showMessage('loading sound');
+sound.load();
+
