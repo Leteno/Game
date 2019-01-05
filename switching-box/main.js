@@ -1,6 +1,7 @@
 
 var N = 6;
-var board = new Board(N);
+var help;
+var board;
 var difficulty = 3;
 
 canvas = document.getElementById('canvas');
@@ -84,30 +85,35 @@ function draw() {
 
 
 function onStartPicking() {
+    board = new Board(N);
     gameState = STATE_START_PICKING;
     board.register(onPickItem, onRightItemPick, onWrongItemPick);
     board.switchToSelectingState();
     board.addAnimation(watchingQueue);
+
+    if (help) {
+	help.pause();
+    }
+    help = new Help(board);
 }
 
-var helpServiceIntervalID = 0;
 function onStartGaming() {
     board.switchToGamingState();
+    help.start();
 
     wrongAnser = 0;
-
-    if (helpServiceIntervalID) {
-	clearInterval(helpServiceIntervalID);
-    }
-    helpServiceIntervalID = setInterval(help, 3000);
 }
 
 function onGameSucceed() {
     console.log('we succeed one');
+    help.pause();
+    board.clearAnimations();
+
+    console.log('we are going to make a new map...');
+    setTimeout(onStartPicking, 4000);
 }
 
 function onReload() {
-    board = new Board(N);
     onStartPicking();
 }
 
@@ -188,33 +194,8 @@ function onWrongItemPick(item) {
     watchingQueue.enque(seq);
 
     wrongAnswer++;
-    if (wrongAnswer % 5 == 0) {
-	help();
-    }
-}
-
-function help() {
-    if (gameState == STATE_GAMING) {
-	var count = 0;
-	while (count++ < 100) {
-	    var row = random(N);
-	    var col = random(N);
-	    var shape = board.getShape(row, col);
-	    if (shape && shape.hide) { // TODO leak the item detail
-		var seq = new Sequence();
-		var showUp = function() {
-		    shape.hide = 0;
-		};
-		var hideIt = function() {
-		    shape.hide = 1;
-		};
-		seq.enque(new AtOnce(showUp));
-		seq.enque(new Delay(2000, hideIt));
-		board.addAnimation(seq, inExtraTunnel=1);
-
-		break;
-	    }
-	}
+    if (wrongAnswer % 5 == 2) {
+	help.serveOnce();
     }
 }
 

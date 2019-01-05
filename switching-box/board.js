@@ -210,6 +210,13 @@ Board.prototype.addAnimation = function(animation, inExtraTunnel=0) {
     }
 };
 
+Board.prototype.clearAnimations = function() {
+    this.mainJobs = [];
+    this.extraJobs = [];
+    this.mainMessageQueue.clear();
+    this.extraMessageQueue.clear();
+};
+
 // speed is pixel per 0.1s
 function Swap(shape1, shape2, onSuccess, speed=10) {
     this.shape1 = shape1;

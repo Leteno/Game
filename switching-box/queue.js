@@ -28,6 +28,9 @@ Queue.prototype.isFinished = function() {
 Queue.prototype.enque = function(runnable) {
     this.list.push(runnable);
 };
+Queue.prototype.clear = function() {
+    this.list = [];
+};
 
 function Sequence() {
     this.list = [];
@@ -50,6 +53,9 @@ Sequence.prototype.isFinished = function() {
 };
 Sequence.prototype.enque = function(runnable) {
     this.list.push(runnable);
+};
+Sequence.prototype.clear = function() {
+    this.list = [];
 };
 
 function Delay(timeInMs, func) {
