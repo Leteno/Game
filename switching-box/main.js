@@ -25,6 +25,7 @@ var gameState = STATE_START_PICKING;
 var wrongAnswer = 0;
 var watchingQueue = new Queue();
 
+
 function main() {
 
     init();
@@ -87,6 +88,15 @@ function draw() {
     logic();
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // draw Frame
+    ctx.save();
+    ctx.strokeStyle = '#CCC';
+    ctx.fillStyle = '#1E8AE8';
+    ctx.lineWidth = 10;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.strokeRect(0, 0, canvas.width, canvas.height);
+    ctx.restore();
 
     ctx.save();
     ctx.translate(boardOffsetX, boardOffsetY);
