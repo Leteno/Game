@@ -1,18 +1,50 @@
 <html>
 
-  <header><title>Happy NewYear, Jia</title></header>
+  <header>
+    <title>Happy NewYear, Jia</title>
+    <style>
+      #canvas {
+      margin-top: 20;
+      margin-bottom: 20;
+      }
+      #reload {
+      margin: 5;
+      }
+      .help {
+      zoom: 200%;
+      margin-top: 8px;
+      }
+      .message {
+      zoom: 150%;
+      margin-top: 20px;
+      }
+    </style>
+  </header>
 
   <body>
     <div>
-      <canvas id='canvas' width='550' height='400' />
+      <canvas id='canvas' width='800' height='500' />
     </div>
-    <button id='reload' width='40' height='40'>reload</button>
+    <button id='reload' style='font-size:20'>reload</button>
+    <div>
+      <input class='help' id='help1' type='checkbox' style='display:inline-block'/><label class='help'>help</label>
+      <input class='help' id='help2' type='checkbox' style='display:inline-block'/><label class='help'>help</label>
+      <input class='help' id='help3' type='checkbox' style='display:inline-block'/><label class='help'>help</label>
+    </div>
+    <p id="message"></p>
+
+    <audio id='coinAudio' src='assets/coin.wav' autostart='false'></audio>
+    <audio id='shineAppearsAudio' src='assets/shine_appears.wav' autostart='false'></audio>
   </body>
 
+  <script type="text/javascript" src="hint.js"></script>
   <script type="text/javascript" src="tool.js"></script>
+  <script type="text/javascript" src="sound.js"></script>
+  <script type="text/javascript" src="difficulty.js"></script>
   <script type="text/javascript" src="queue.js"></script>
   <script type="text/javascript" src="shape.js"></script>
   <script type="text/javascript" src="board.js"></script>
+  <script type="text/javascript" src="help.js"></script>
   <script type="text/javascript" src="main.js"></script>
 
 </html>

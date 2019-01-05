@@ -14,12 +14,17 @@ function Board(n, chessSize = 40, pickingChoiceCount = 2) {
 
 
     this.mainMessageQueue = new Sequence();
-    this.jobs = [];
+    this.extraMessageQueue = new Sequence();
+    this.mainJobs = [];
+    this.extraJobs = [];
 
+    this.onPickItem = 0;
+    this.onRightItemPick = 0;
+    this.onWrongItemPick = 0;
 
-    this.gap = 20;
-    this.x0 = 20;
-    this.y0 = 20;
+    this.gap = Math.floor(chessSize / 2);
+    this.x0 = 0;
+    this.y0 = 0;
     this.matrix = [];
     for (var r = 0; r < n; r++) {
 	for (var c = 0; c < n; c++) {
@@ -43,7 +48,6 @@ Board.prototype.getShapeFromXY = function(x, y) {
     var fromX = this.x0 + col * (this.chessSize + this.gap);
     var fromY = this.y0 + row * (this.chessSize + this.gap);
     var toX = fromX + this.chessSize, toY = fromY + this.chessSize;
-    console.log(fromX, fromY, toX, toY, x, y, col, row);
     if (collision(fromX, fromY, toX, toY, x, y)) {
 	return this.getShape(row, col);
     }
@@ -70,12 +74,17 @@ Board.prototype.getIndexOfShape = function(shape) {
 
 Board.prototype.draw = function(ctx) {
 
-    while (this.jobs.length > 0) {
-	var anim = this.jobs.shift();
+    while (this.mainJobs.length > 0) {
+	var anim = this.mainJobs.shift();
 	this.mainMessageQueue.enque(anim);
+    }
+    while (this.extraJobs.length > 0) {
+	var anim = this.extraJobs.shift();
+	this.extraMessageQueue.enque(anim);
     }
 
     this.mainMessageQueue.run();
+    this.extraMessageQueue.run();
 
     ctx.save();
 
@@ -111,9 +120,27 @@ Board.prototype.onclick = function(x, y) {
 	} else if (!this.hasFinishPickingItem()) {
 	    shape.selected = 1;
 	}
-    } else {
-	shape.hide = !shape.hide;
+	if (isFunction(this.onPickItem)) this.onPickItem();
+    } else if (this.state == this.STATE_GAMING) {
+	if (shape.selected) {
+	    if (shape.hide) {
+		if (isFunction(this.onRightItemPick)) {
+		    this.onRightItemPick(shape);
+		}
+	    }
+	} else {
+	    if (isFunction(this.onWrongItemPick)) {
+		this.onWrongItemPick(shape);
+	    }
+	}
     }
+    return 1;
+};
+
+Board.prototype.register = function(onPickItem=0, onRightItemPick=0, onWrongItemPick=0) {
+    this.onPickItem = onPickItem;
+    this.onRightItemPick = onRightItemPick;
+    this.onWrongItemPick = onWrongItemPick;
 };
 
 Board.prototype.hasFinishPickingItem = function() {
@@ -125,6 +152,16 @@ Board.prototype.hasFinishPickingItem = function() {
         }
     }
     return picked >= this.pickingChoiceCount;
+};
+
+Board.prototype.isAllFoundOut = function() {
+    for (var i = 0; i < this.matrix.length; i++) {
+        var item = this.matrix[i];
+        if (item.selected && item.hide) {
+	    return 0;
+        }
+    }
+    return 1;
 };
 
 Board.prototype.switchToNoneState = function() {
@@ -165,15 +202,25 @@ Board.prototype.isAvaliable = function(row, col) {
     return 0;
 };
 
-Board.prototype.addAnimation = function(animation) {
-    this.jobs.push(animation);
+Board.prototype.addAnimation = function(animation, inExtraTunnel=0) {
+    if (inExtraTunnel) {
+	this.mainJobs.push(animation);
+    } else {
+	this.extraJobs.push(animation);
+    }
+};
+
+Board.prototype.clearAnimations = function() {
+    this.mainJobs = [];
+    this.extraJobs = [];
+    this.mainMessageQueue.clear();
+    this.extraMessageQueue.clear();
 };
 
 // speed is pixel per 0.1s
 function Swap(shape1, shape2, onSuccess, speed=10) {
     this.shape1 = shape1;
     this.shape2 = shape2;
-    this.speed = speed;
 
     this.x1 = shape1.px;
     this.y1 = shape1.py;
@@ -182,6 +229,18 @@ function Swap(shape1, shape2, onSuccess, speed=10) {
 
     this.begin = 0;
     this.onSuccess = onSuccess;;
+
+    var deltaX = Math.abs(this.x1 - this.x2);
+    var deltaY = Math.abs(this.y1 - this.y2);
+    var sinA = deltaY / Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+    var cosA = deltaX / Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+    this.xSpeed = speed * cosA;
+    this.ySpeed = speed * sinA;
+    this.deltaX = deltaX;
+    this.deltaY = deltaY;
+
+    this.x1Tox2 = this.x1 > this.x2 ? -1 : 1;
+    this.y1Toy2 = this.y1 > this.y2 ? -1 : 1;
 }
 
 Swap.prototype.run = function() {
@@ -191,24 +250,21 @@ Swap.prototype.run = function() {
     }
 
     var elapsing = currentTime - this.begin;
-    console.log('elapsing', elapsing);
-    var moving = elapsing / 100 * this.speed; // per 0.1s
+    var timeUnit = elapsing / 100; // per 0.1s
+    var acceleration = timeUnit * 1.5;
+    var xMoving = (this.xSpeed + acceleration) * timeUnit;
+    var yMoving = (this.ySpeed + acceleration) * timeUnit;
 
     var _x, _y;
-    console.log(this.x1, this.y1, this.x2, this.y2);
-    var xGap = Math.abs(this.x1 - this.x2);
-    var yGap = Math.abs(this.y1 - this.y2);
-    var x1Tox2 = this.x1 > this.x2 ? -1 : 1;
-    var y1Toy2 = this.y1 > this.y2 ? -1 : 1;
     // for shape1
-    _x = moving < xGap ? this.x1 + moving * x1Tox2 : this.x2;
-    _y = moving < yGap ? this.y1 + moving * y1Toy2 : this.y2;
+    _x = xMoving < this.deltaX ? this.x1 + xMoving * this.x1Tox2 : this.x2;
+    _y = yMoving < this.deltaY ? this.y1 + yMoving * this.y1Toy2 : this.y2;
     this.shape1.px = _x;
     this.shape1.py = _y;
 
     // for shape2
-    _x = moving < xGap ? this.x2 + moving * -x1Tox2 : this.x1;
-    _y = moving < yGap ? this.y2 + moving * -y1Toy2 : this.y1;
+    _x = xMoving < this.deltaX ? this.x2 + xMoving * -this.x1Tox2 : this.x1;
+    _y = yMoving < this.deltaY ? this.y2 + yMoving * -this.y1Toy2 : this.y1;
     this.shape2.px = _x;
     this.shape2.py = _y;
 
