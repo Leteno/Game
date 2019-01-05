@@ -36,10 +36,11 @@ function onSwap() {
 	    continue;
 	}
 	if (board.isAvaliable(row1, col1) && board.isAvaliable(row2, col2)) {
-	    var func = function() {
-		board.swap(row1, col1, row2, col2);
-	    };
-	    board.addJob(func);
+	    var swap = board.createSwapAnimation(row1, col1, row2, col2);
+	    if (!swap) {
+		continue;
+	    }
+	    board.addAnimation(swap);
 	    break;
 	}
     }

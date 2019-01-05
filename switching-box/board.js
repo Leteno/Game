@@ -11,7 +11,7 @@ function Board(n, chessSize = 40) {
     this.state = this.STATE_NONE;
 
 
-    this.mainQueue = new Queue();
+    this.mainMessageQueue = new Sequence();
     this.jobs = [];
 
 
@@ -68,12 +68,12 @@ Board.prototype.getIndexOfShape = function(shape) {
 
 Board.prototype.draw = function(ctx) {
 
-    if (this.jobs.length > 0) {
-	var func = this.jobs.shift();
-	func();
+    while (this.jobs.length > 0) {
+	var anim = this.jobs.shift();
+	this.mainMessageQueue.enque(anim);
     }
 
-    this.mainQueue.run();
+    this.mainMessageQueue.run();
 
     ctx.save();
 
@@ -118,7 +118,7 @@ Board.prototype.switchState = function() {
     }
 };
 
-Board.prototype.swap = function(row1, col1, row2, col2) {
+Board.prototype.createSwapAnimation = function(row1, col1, row2, col2) {
     var shape1 = this.getShape(row1, col1);
     var shape2 = this.getShape(row2, col2);
     if (shape1.isMoving() || shape2.isMoving()) {
@@ -135,8 +135,7 @@ Board.prototype.swap = function(row1, col1, row2, col2) {
 	that.matrix[index1] = shape2;
 	that.matrix[index2] = shape1;
     };
-    this.mainQueue.enque(new Swap(shape1, shape2, onSuccess));
-    return 1;
+    return new Swap(shape1, shape2, onSuccess);
 };
 
 Board.prototype.isAvaliable = function(row, col) {
@@ -144,10 +143,9 @@ Board.prototype.isAvaliable = function(row, col) {
     return !shape.isMoving();
 };
 
-Board.prototype.addJob = function(func) {
-    this.jobs.push(func);
+Board.prototype.addAnimation = function(animation) {
+    this.jobs.push(animation);
 };
-
 
 // speed is pixel per 0.1s
 function Swap(shape1, shape2, onSuccess, speed=10) {
