@@ -1,13 +1,15 @@
 
 
-function Board(n, chessSize = 40) {
+function Board(n, chessSize = 40, pickingChoiceCount = 2) {
     // n x n chessboard
     this.n = n;
     this.chessSize = chessSize;
+    this.pickingChoiceCount = pickingChoiceCount;
 
 
     this.STATE_NONE = 0;
     this.STATE_SELECTING = 1;
+    this.STATE_GAMING = 2;
     this.state = this.STATE_NONE;
 
 
@@ -104,18 +106,35 @@ Board.prototype.onclick = function(x, y) {
 	return;
     }
     if (this.state == this.STATE_SELECTING) {
-	shape.selected = !shape.selected;
+	if (shape.selected) {
+	    shape.selected = 0;
+	} else if (!this.hasFinishPickingItem()) {
+	    shape.selected = 1;
+	}
     } else {
 	shape.hide = !shape.hide;
     }
 };
 
-Board.prototype.switchState = function() {
-    if (this.state == this.STATE_SELECTING) {
-	this.state = this.STATE_NONE;
-    } else {
-	this.state = this.STATE_SELECTING;
+Board.prototype.hasFinishPickingItem = function() {
+    var picked = 0;
+    for (var i = 0; i < this.matrix.length; i++) {
+        var item = this.matrix[i];
+        if (item.selected) {
+	    picked ++;
+        }
     }
+    return picked >= this.pickingChoiceCount;
+};
+
+Board.prototype.switchToNoneState = function() {
+    this.state = this.STATE_NONE;
+};
+Board.prototype.switchToSelectingState = function() {
+    this.state = this.STATE_SELECTING;
+};
+Board.prototype.switchToGamingState = function() {
+    this.state = this.STATE_GAMING;
 };
 
 Board.prototype.createSwapAnimation = function(row1, col1, row2, col2) {
@@ -140,7 +159,10 @@ Board.prototype.createSwapAnimation = function(row1, col1, row2, col2) {
 
 Board.prototype.isAvaliable = function(row, col) {
     var shape = this.getShape(row, col);
-    return !shape.isMoving();
+    if (shape) {
+	return !shape.isMoving();
+    }
+    return 0;
 };
 
 Board.prototype.addAnimation = function(animation) {
@@ -203,5 +225,3 @@ Swap.prototype.run = function() {
 Swap.prototype.isFinished = function() {
     return !this.shape1.isMoving() && !this.shape2.isMoving();
 };
-
-

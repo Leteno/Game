@@ -11,3 +11,7 @@ function collision(fromX, fromY, toX, toY, x, y, threshold=5) {
     return fromX-threshold <= x && x <= toX+threshold &&
 	fromY-threshold <= y && y <= toY+threshold;
 }
+
+function isFunction(functionToCheck) {
+    return functionToCheck && {}.toString.call(functionToCheck) === '[object Function]';
+}
