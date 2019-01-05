@@ -16,6 +16,9 @@ function Board(n, chessSize = 40, pickingChoiceCount = 2) {
     this.mainMessageQueue = new Sequence();
     this.jobs = [];
 
+    this.onPickItem = 0;
+    this.onRightItemPick = 0;
+    this.onWrongItemPick = 0;
 
     this.gap = 20;
     this.x0 = 20;
@@ -110,9 +113,27 @@ Board.prototype.onclick = function(x, y) {
 	} else if (!this.hasFinishPickingItem()) {
 	    shape.selected = 1;
 	}
-    } else {
-	shape.hide = !shape.hide;
+	if (isFunction(this.onPickItem)) this.onPickItem();
+    } else if (this.state == this.STATE_GAMING) {
+	if (shape.selected) {
+	    if (shape.hide) {
+		if (isFunction(this.onRightItemPick)) {
+		    this.onRightItemPick(shape);
+		}
+	    }
+	} else {
+	    if (isFunction(this.onWrongItemPick)) {
+		this.onWrongItemPick(shape);
+	    }
+	}
     }
+    return 1;
+};
+
+Board.prototype.register = function(onPickItem=0, onRightItemPick=0, onWrongItemPick=0) {
+    this.onPickItem = onPickItem;
+    this.onRightItemPick = onRightItemPick;
+    this.onWrongItemPick = onWrongItemPick;
 };
 
 Board.prototype.hasFinishPickingItem = function() {
@@ -124,6 +145,16 @@ Board.prototype.hasFinishPickingItem = function() {
         }
     }
     return picked >= this.pickingChoiceCount;
+};
+
+Board.prototype.isAllFoundOut = function() {
+    for (var i = 0; i < this.matrix.length; i++) {
+        var item = this.matrix[i];
+        if (item.selected && item.hide) {
+	    return 0;
+        }
+    }
+    return 1;
 };
 
 Board.prototype.switchToNoneState = function() {

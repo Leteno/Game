@@ -19,6 +19,8 @@ var STATE_GAMING = 4;
 
 var gameState = STATE_START_PICKING;
 
+var wrongAnswer = 0;
+
 function main() {
 
     reloadBtn.onclick = onReload;
@@ -82,11 +84,24 @@ function draw() {
 
 function onStartPicking() {
     gameState = STATE_START_PICKING;
+    board.register(onPickItem, onRightItemPick, onWrongItemPick);
     board.switchToSelectingState();
 }
 
+var helpServiceIntervalID = 0;
 function onStartGaming() {
     board.switchToGamingState();
+
+    wrongAnser = 0;
+
+    if (helpServiceIntervalID) {
+	clearInterval(helpServiceIntervalID);
+    }
+    helpServiceIntervalID = setInterval(help, 3000);
+}
+
+function onGameSucceed() {
+    console.log('we succeed one');
 }
 
 function onReload() {
@@ -138,6 +153,65 @@ function onCanvasClick(event) {
     if (board.onclick(event.clientX - boardOffsetX, event.clientY - boardOffsetY)) {
 	// resolve by board
 	return true;
+    }
+}
+
+function onPickItem() {
+    console.log('onPickItem');
+}
+
+function onRightItemPick(item) {
+    console.log('pick up the right item');
+
+    item.hide = 0;
+
+    if (board.isAllFoundOut()) {
+	onGameSucceed();
+    }
+}
+
+function onWrongItemPick(item) {
+    console.log('pick the wrong one');
+
+    var seq = new Sequence();
+    var showUp = function() {
+	item.hide = 0;
+    };
+    var hideIt = function() {
+	item.hide = 1;
+    };
+    seq.enque(new AtOnce(showUp));
+    seq.enque(new Delay(2000, hideIt));
+    board.addAnimation(seq);
+
+    wrongAnswer++;
+    if (wrongAnswer % 5 == 0) {
+	help();
+    }
+}
+
+function help() {
+    if (gameState == STATE_GAMING) {
+	var count = 0;
+	while (count++ < 100) {
+	    var row = random(N);
+	    var col = random(N);
+	    var shape = board.getShape(row, col);
+	    if (shape && shape.hide) { // TODO leak the item detail
+		var seq = new Sequence();
+		var showUp = function() {
+		    shape.hide = 0;
+		};
+		var hideIt = function() {
+		    shape.hide = 1;
+		};
+		seq.enque(new AtOnce(showUp));
+		seq.enque(new Delay(2000, hideIt));
+		board.addAnimation(seq);
+
+		break;
+	    }
+	}
     }
 }
 
