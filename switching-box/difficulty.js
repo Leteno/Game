@@ -26,3 +26,7 @@ Difficulty.prototype.getSwapingTime = function() {
 Difficulty.prototype.getSwapingItemCountAtSameTime = function() {
     return 3 + this.value * 2;
 };
+
+Difficulty.prototype.getTaskItemCount = function() {
+    return 1 + Math.floor(this.value / 2);
+};

@@ -40,14 +40,14 @@ function logic() {
 	    gameState = STATE_ABOUT_TO_GAME;
 	    var func = function() {
 		gameState = STATE_SWAPING_ITEMS;
-		console.log("swaping items");
+		showMessage("Swaping items");
 	    };
-	    console.log("game is about to start...");
+	    showMessage("Game is about to start...");
 	    setTimeout(func, 2000);
 	}
 	break;
     case STATE_ABOUT_TO_GAME:
-	console.log("lalala, I am not alone...");
+	showMessage("About to game");
 	break;
     case STATE_SWAPING_ITEMS:
 	gameState = STATE_WAITING_SWAP_FINISH;
@@ -55,7 +55,7 @@ function logic() {
 	var onSwapFinish = function() {
 	    gameState = STATE_GAMING;
 	    onStartGaming();
-	    console.log("game is started!");
+	    showMessage("Game is started!");
 	};
 	itemEachTime = difficulty.getSwapingItemCountAtSameTime();
 	times = difficulty.getSwapingTime();
@@ -64,7 +64,6 @@ function logic() {
     case STATE_WAITING_SWAP_FINISH:
 	break;
     case STATE_GAMING:
-	console.log("lalala, we are gaming~");
 	break;
     }
 }
@@ -86,7 +85,9 @@ function draw() {
 
 function onStartPicking() {
 
-    board = new Board(N);
+    var count = difficulty.getTaskItemCount();
+    var chessSize = 40;
+    board = new Board(N, chessSize, pickingChoiceCount=count);
     gameState = STATE_START_PICKING;
     board.register(onPickItem, onRightItemPick, onWrongItemPick);
     board.switchToSelectingState();
@@ -97,6 +98,8 @@ function onStartPicking() {
 	help.pause();
     }
     help = new Help(board);
+
+    showMessage('Please pick ' + count + ' items');
 }
 
 function onStartGaming() {
@@ -107,12 +110,12 @@ function onStartGaming() {
 }
 
 function onGameSucceed() {
-    console.log('we succeed one');
+    showMessage('we succeed one');
     help.pause();
     board.clearAnimations();
     difficulty.raiseUp();
 
-    console.log('we are going to make a new map...');
+    showMessage('we are going to make a new map...');
     setTimeout(onStartPicking, 4000);
 }
 
@@ -174,7 +177,7 @@ function onPickItem() {
 }
 
 function onRightItemPick(item) {
-    console.log('pick up the right item');
+    showMessage('pick up the right item');
 
     item.hide = 0;
 
@@ -184,7 +187,7 @@ function onRightItemPick(item) {
 }
 
 function onWrongItemPick(item) {
-    console.log('pick the wrong one');
+    showMessage('pick the wrong one');
 
     var seq = new Sequence();
     var showUp = function() {
