@@ -251,8 +251,9 @@ Swap.prototype.run = function() {
 
     var elapsing = currentTime - this.begin;
     var timeUnit = elapsing / 100; // per 0.1s
-    var xMoving = this.xSpeed * timeUnit;
-    var yMoving = this.ySpeed * timeUnit;
+    var acceleration = timeUnit * 1.5;
+    var xMoving = (this.xSpeed + acceleration) * timeUnit;
+    var yMoving = (this.ySpeed + acceleration) * timeUnit;
 
     var _x, _y;
     // for shape1
