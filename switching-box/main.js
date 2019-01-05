@@ -2,7 +2,7 @@
 var N = 6;
 var help;
 var board;
-var difficulty = 3;
+var difficulty = new Difficulty();;
 
 canvas = document.getElementById('canvas');
 reloadBtn = document.getElementById('reload');
@@ -52,13 +52,13 @@ function logic() {
     case STATE_SWAPING_ITEMS:
 	gameState = STATE_WAITING_SWAP_FINISH;
 	board.maskAll();
-	itemEachTime = difficulty;
-	times = difficulty * 3;
 	var onSwapFinish = function() {
 	    gameState = STATE_GAMING;
 	    onStartGaming();
 	    console.log("game is started!");
 	};
+	itemEachTime = difficulty.getSwapingItemCountAtSameTime();
+	times = difficulty.getSwapingTime();
 	makeSwap(itemEachTime, times, onSwapFinish);
 	break;
     case STATE_WAITING_SWAP_FINISH:
@@ -85,11 +85,13 @@ function draw() {
 
 
 function onStartPicking() {
+
     board = new Board(N);
     gameState = STATE_START_PICKING;
     board.register(onPickItem, onRightItemPick, onWrongItemPick);
     board.switchToSelectingState();
     board.addAnimation(watchingQueue);
+
 
     if (help) {
 	help.pause();
@@ -108,12 +110,14 @@ function onGameSucceed() {
     console.log('we succeed one');
     help.pause();
     board.clearAnimations();
+    difficulty.raiseUp();
 
     console.log('we are going to make a new map...');
     setTimeout(onStartPicking, 4000);
 }
 
 function onReload() {
+    difficulty = new Difficulty();
     onStartPicking();
 }
 
@@ -125,7 +129,8 @@ function makeSwap(itemEachTime, times, onFinished=0) {
 	    var rowCol2 = getRandomAvaliableItem();
 	    if (rowCol1 && rowCol2) {
 		var swap = board.createSwapAnimation(
-		    rowCol1[0], rowCol1[1], rowCol2[0], rowCol2[1]);
+		    rowCol1[0], rowCol1[1], rowCol2[0], rowCol2[1],
+		    difficulty.getMovingSpeed());
 		queue.enque(swap);
 	    }
 	}
