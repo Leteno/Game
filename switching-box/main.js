@@ -4,11 +4,13 @@ var help;
 var board;
 var difficulty = new Difficulty();;
 
-canvas = document.getElementById('canvas');
-reloadBtn = document.getElementById('reload');
-ctx = canvas.getContext('2d');
+var canvas = document.getElementById('canvas');
+var reloadBtn = document.getElementById('reload');
+var ctx = canvas.getContext('2d');
 
-boardOffsetX = 20; boardOffsetY = 20;
+var boardOffsetX;
+var boardOffsetY;
+var chessSize;
 
 var raf;
 
@@ -25,12 +27,24 @@ var watchingQueue = new Queue();
 
 function main() {
 
+    init();
+
     reloadBtn.onclick = onReload;
     canvas.onclick = onCanvasClick;
 
     onStartPicking();
 
     raf = requestAnimationFrame(draw);
+}
+
+function init() {
+    var margin = 20;
+    var chessCount = (N + N / 2 - 0.5);
+    chessSize = (Math.min(canvas.width, canvas.height) - 2 * margin) / chessCount;
+    var boardWidth = chessSize * chessCount;
+    var boardHeight = chessSize * chessCount;
+    boardOffsetX = (canvas.width - boardWidth) / 2;
+    boardOffsetY = (canvas.height - boardHeight) / 2;
 }
 
 function logic() {
@@ -86,7 +100,6 @@ function draw() {
 function onStartPicking() {
 
     var count = difficulty.getTaskItemCount();
-    var chessSize = 40;
     board = new Board(N, chessSize, pickingChoiceCount=count);
     gameState = STATE_START_PICKING;
     board.register(onPickItem, onRightItemPick, onWrongItemPick);

@@ -22,9 +22,9 @@ function Board(n, chessSize = 40, pickingChoiceCount = 2) {
     this.onRightItemPick = 0;
     this.onWrongItemPick = 0;
 
-    this.gap = 20;
-    this.x0 = 20;
-    this.y0 = 20;
+    this.gap = Math.floor(chessSize / 2);
+    this.x0 = 0;
+    this.y0 = 0;
     this.matrix = [];
     for (var r = 0; r < n; r++) {
 	for (var c = 0; c < n; c++) {

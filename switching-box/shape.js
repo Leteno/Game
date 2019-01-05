@@ -44,7 +44,7 @@ Shape.prototype.draw = function(ctx) {
 
 	if (this.selected) {
 
-	    radius = 10;
+	    radius = currentSize / 4;
 	    margin = 4;
 
 	    x0 = x + currentSize - radius - margin;
