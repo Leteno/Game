@@ -14,7 +14,9 @@ function Board(n, chessSize = 40, pickingChoiceCount = 2) {
 
 
     this.mainMessageQueue = new Sequence();
-    this.jobs = [];
+    this.extraMessageQueue = new Sequence();
+    this.mainJobs = [];
+    this.extraJobs = [];
 
     this.onPickItem = 0;
     this.onRightItemPick = 0;
@@ -72,12 +74,17 @@ Board.prototype.getIndexOfShape = function(shape) {
 
 Board.prototype.draw = function(ctx) {
 
-    while (this.jobs.length > 0) {
-	var anim = this.jobs.shift();
+    while (this.mainJobs.length > 0) {
+	var anim = this.mainJobs.shift();
 	this.mainMessageQueue.enque(anim);
+    }
+    while (this.extraJobs.length > 0) {
+	var anim = this.extraJobs.shift();
+	this.extraMessageQueue.enque(anim);
     }
 
     this.mainMessageQueue.run();
+    this.extraMessageQueue.run();
 
     ctx.save();
 
@@ -195,8 +202,12 @@ Board.prototype.isAvaliable = function(row, col) {
     return 0;
 };
 
-Board.prototype.addAnimation = function(animation) {
-    this.jobs.push(animation);
+Board.prototype.addAnimation = function(animation, inExtraTunnel=0) {
+    if (inExtraTunnel) {
+	this.mainJobs.push(animation);
+    } else {
+	this.extraJobs.push(animation);
+    }
 };
 
 // speed is pixel per 0.1s

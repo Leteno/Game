@@ -20,6 +20,7 @@ var STATE_GAMING = 4;
 var gameState = STATE_START_PICKING;
 
 var wrongAnswer = 0;
+var watchingQueue = new Queue();
 
 function main() {
 
@@ -86,6 +87,7 @@ function onStartPicking() {
     gameState = STATE_START_PICKING;
     board.register(onPickItem, onRightItemPick, onWrongItemPick);
     board.switchToSelectingState();
+    board.addAnimation(watchingQueue);
 }
 
 var helpServiceIntervalID = 0;
@@ -182,7 +184,8 @@ function onWrongItemPick(item) {
     };
     seq.enque(new AtOnce(showUp));
     seq.enque(new Delay(2000, hideIt));
-    board.addAnimation(seq);
+
+    watchingQueue.enque(seq);
 
     wrongAnswer++;
     if (wrongAnswer % 5 == 0) {
@@ -207,7 +210,7 @@ function help() {
 		};
 		seq.enque(new AtOnce(showUp));
 		seq.enque(new Delay(2000, hideIt));
-		board.addAnimation(seq);
+		board.addAnimation(seq, inExtraTunnel=1);
 
 		break;
 	    }
