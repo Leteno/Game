@@ -43,7 +43,6 @@ Board.prototype.getShapeFromXY = function(x, y) {
     var fromX = this.x0 + col * (this.chessSize + this.gap);
     var fromY = this.y0 + row * (this.chessSize + this.gap);
     var toX = fromX + this.chessSize, toY = fromY + this.chessSize;
-    console.log(fromX, fromY, toX, toY, x, y, col, row);
     if (collision(fromX, fromY, toX, toY, x, y)) {
 	return this.getShape(row, col);
     }
@@ -191,11 +190,9 @@ Swap.prototype.run = function() {
     }
 
     var elapsing = currentTime - this.begin;
-    console.log('elapsing', elapsing);
     var moving = elapsing / 100 * this.speed; // per 0.1s
 
     var _x, _y;
-    console.log(this.x1, this.y1, this.x2, this.y2);
     var xGap = Math.abs(this.x1 - this.x2);
     var yGap = Math.abs(this.y1 - this.y2);
     var x1Tox2 = this.x1 > this.x2 ? -1 : 1;
