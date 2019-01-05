@@ -203,7 +203,6 @@ Board.prototype.addAnimation = function(animation) {
 function Swap(shape1, shape2, onSuccess, speed=10) {
     this.shape1 = shape1;
     this.shape2 = shape2;
-    this.speed = speed;
 
     this.x1 = shape1.px;
     this.y1 = shape1.py;
@@ -212,6 +211,18 @@ function Swap(shape1, shape2, onSuccess, speed=10) {
 
     this.begin = 0;
     this.onSuccess = onSuccess;;
+
+    var deltaX = Math.abs(this.x1 - this.x2);
+    var deltaY = Math.abs(this.y1 - this.y2);
+    var sinA = deltaY / Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+    var cosA = deltaX / Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+    this.xSpeed = speed * cosA;
+    this.ySpeed = speed * sinA;
+    this.deltaX = deltaX;
+    this.deltaY = deltaY;
+
+    this.x1Tox2 = this.x1 > this.x2 ? -1 : 1;
+    this.y1Toy2 = this.y1 > this.y2 ? -1 : 1;
 }
 
 Swap.prototype.run = function() {
@@ -221,22 +232,20 @@ Swap.prototype.run = function() {
     }
 
     var elapsing = currentTime - this.begin;
-    var moving = elapsing / 100 * this.speed; // per 0.1s
+    var timeUnit = elapsing / 100; // per 0.1s
+    var xMoving = this.xSpeed * timeUnit;
+    var yMoving = this.ySpeed * timeUnit;
 
     var _x, _y;
-    var xGap = Math.abs(this.x1 - this.x2);
-    var yGap = Math.abs(this.y1 - this.y2);
-    var x1Tox2 = this.x1 > this.x2 ? -1 : 1;
-    var y1Toy2 = this.y1 > this.y2 ? -1 : 1;
     // for shape1
-    _x = moving < xGap ? this.x1 + moving * x1Tox2 : this.x2;
-    _y = moving < yGap ? this.y1 + moving * y1Toy2 : this.y2;
+    _x = xMoving < this.deltaX ? this.x1 + xMoving * this.x1Tox2 : this.x2;
+    _y = yMoving < this.deltaY ? this.y1 + yMoving * this.y1Toy2 : this.y2;
     this.shape1.px = _x;
     this.shape1.py = _y;
 
     // for shape2
-    _x = moving < xGap ? this.x2 + moving * -x1Tox2 : this.x1;
-    _y = moving < yGap ? this.y2 + moving * -y1Toy2 : this.y1;
+    _x = xMoving < this.deltaX ? this.x2 + xMoving * -this.x1Tox2 : this.x1;
+    _y = yMoving < this.deltaY ? this.y2 + yMoving * -this.y1Toy2 : this.y1;
     this.shape2.px = _x;
     this.shape2.py = _y;
 
