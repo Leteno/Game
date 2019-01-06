@@ -3,6 +3,9 @@ var N = 6;
 var help;
 var board;
 var sound = new Sound();
+var scoreAndLevelLabel = new ScoreAndLevelLabel(level=0);
+var taskLabel = new Label();
+var hintLabel = new Label();
 var difficulty = new Difficulty();;
 
 var canvas = document.getElementById('canvas');
@@ -104,6 +107,18 @@ function draw() {
     board.draw(ctx);
     ctx.restore();
 
+    ctx.save();
+    ctx.translate(20, 40);
+    scoreAndLevelLabel.draw(ctx);
+    ctx.translate(0, 100);
+    taskLabel.draw(ctx);
+    ctx.restore();
+
+    ctx.save();
+    ctx.translate(20, canvas.height - 100);
+    hintLabel.draw(ctx);
+    ctx.restore();
+
     raf = requestAnimationFrame(draw);
 }
 
@@ -124,6 +139,9 @@ function onStartPicking() {
     help = new Help(board);
 
     showMessage('Please pick ' + count + ' items');
+
+    taskLabel.setText('task: ' + count + (count > 0 ? ' items' : ' item'));
+    hintLabel.setText('pick ' + count + (count > 0 ? ' items' : ' item'));
 }
 
 function onStartGaming() {
@@ -135,9 +153,11 @@ function onStartGaming() {
 
 function onGameSucceed() {
     showMessage('we succeed one');
+    hintLabel.setText('Good. =v=');
     help.pause();
     board.clearAnimations();
     difficulty.raiseUp();
+    scoreAndLevelLabel.upgrade();
 
     sound.playShineAppears();
     showMessage('we are going to make a new map...');
@@ -203,6 +223,7 @@ function onPickItem() {
 
 function onRightItemPick(item) {
     showMessage('pick up the right item');
+    hintLabel.setText('Bingo');
 
     item.hide = 0;
 
@@ -214,6 +235,7 @@ function onRightItemPick(item) {
 
 function onWrongItemPick(item) {
     showMessage('pick the wrong one');
+    hintLabel.setText('WA =-=');
 
     var seq = new Sequence();
     var showUp = function() {
@@ -251,6 +273,3 @@ sound.onReady = function() { // ugly
 };
 showMessage('loading sound');
 sound.load();
-
-
-
