@@ -20,11 +20,11 @@ Difficulty.prototype.getMovingSpeed = function() {
 };
 
 Difficulty.prototype.getSwapingTime = function() {
-    return 1 + Math.floor(this.value * 3 / 2);
+    return 3 + this.value;
 };
 
 Difficulty.prototype.getSwapingItemCountAtSameTime = function() {
-    return 3 + this.value * 2;
+    return 1 + Math.floor(this.value / 2);
 };
 
 Difficulty.prototype.getTaskItemCount = function() {
