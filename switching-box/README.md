@@ -18,3 +18,8 @@ TODO-LIST:
 * [x] increase difficulty in next level
 * [x] swaping speed accelerate
 * [ ] bug on determine position of item (when you touch outside)
+
+THANKS:
+
+* Thanks [themushroomkingdom](https://themushroomkingdom.net) for the mario resources.
+  I feel so warm when I heard the 'old' song singing. What an old day.

@@ -3,11 +3,16 @@ var N = 6;
 var help;
 var board;
 var sound = new Sound();
+var scoreAndLevelLabel = new ScoreAndLevelLabel(level=0);
+var taskLabel = new Label();
+var hintLabel = new Label();
 var difficulty = new Difficulty();;
 
 var canvas = document.getElementById('canvas');
 var reloadBtn = document.getElementById('reload');
 var ctx = canvas.getContext('2d');
+
+var openingUp = new OpeningUp(canvas);
 
 var boardOffsetX;
 var boardOffsetY;
@@ -35,6 +40,8 @@ function main() {
     canvas.onclick = onCanvasClick;
 
     onStartPicking();
+
+    openingUp.stop();
 
     raf = requestAnimationFrame(draw);
 }
@@ -104,6 +111,18 @@ function draw() {
     board.draw(ctx);
     ctx.restore();
 
+    ctx.save();
+    ctx.translate(20, 40);
+    scoreAndLevelLabel.draw(ctx);
+    ctx.translate(0, 100);
+    taskLabel.draw(ctx);
+    ctx.restore();
+
+    ctx.save();
+    ctx.translate(20, canvas.height - 100);
+    hintLabel.draw(ctx);
+    ctx.restore();
+
     raf = requestAnimationFrame(draw);
 }
 
@@ -124,6 +143,9 @@ function onStartPicking() {
     help = new Help(board);
 
     showMessage('Please pick ' + count + ' items');
+
+    taskLabel.setText('task: ' + count + (count > 0 ? ' items' : ' item'));
+    hintLabel.setText('pick ' + count + (count > 0 ? ' items' : ' item'));
 }
 
 function onStartGaming() {
@@ -135,9 +157,11 @@ function onStartGaming() {
 
 function onGameSucceed() {
     showMessage('we succeed one');
+    hintLabel.setText('Good. =v=');
     help.pause();
     board.clearAnimations();
     difficulty.raiseUp();
+    scoreAndLevelLabel.upgrade();
 
     sound.playShineAppears();
     showMessage('we are going to make a new map...');
@@ -203,6 +227,7 @@ function onPickItem() {
 
 function onRightItemPick(item) {
     showMessage('pick up the right item');
+    hintLabel.setText('Bingo');
 
     item.hide = 0;
 
@@ -214,6 +239,7 @@ function onRightItemPick(item) {
 
 function onWrongItemPick(item) {
     showMessage('pick the wrong one');
+    hintLabel.setText('WA =-=');
 
     var seq = new Sequence();
     var showUp = function() {
@@ -231,15 +257,18 @@ function onWrongItemPick(item) {
     if (wrongAnswer % 5 == 2) {
 	help.serveOnce();
     }
+    sound.playMamaMia();
 }
 
-var yes = 0;
-sound.onReady = function() { // ugly
-    yes ++;
-    if (yes >= 1) {
-	main();
-    }
-}
+var backup = function() {
+    sound.onReady = 0;
+    showMessage('We are not waiting for sound ready now.');
+    main();
+};
+
+var backupTimeout = setTimeout(backup, 3000);
+
 showMessage('loading sound');
 sound.load();
 
+openingUp.kickStart();
