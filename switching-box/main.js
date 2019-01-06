@@ -233,13 +233,24 @@ function onWrongItemPick(item) {
     }
 }
 
+var backup = function() {
+    sound.onReady = 0;
+    showMessage('We are not waiting for sound ready now.');
+    main();
+};
+
+var backupTimeout = setTimeout(backup, 2000);
+
 var yes = 0;
 sound.onReady = function() { // ugly
     yes ++;
-    if (yes >= 1) {
+    if (yes >= 2) {
+	clearInterval(backupTimeout);
 	main();
     }
-}
+};
 showMessage('loading sound');
 sound.load();
+
+
 
