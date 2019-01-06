@@ -4,7 +4,7 @@ function OpeningUp(canvas) {
     this.raf = 0;
 
     this.ctx = this.canvas.getContext('2d');
-    this.marqueue = new Marqueue(['loading .', 'loading ..', 'loading ...'], 1000);
+    this.marqueue = new Marqueue(['loading .', 'loading ..', 'loading ...'], 800);
 }
 
 OpeningUp.prototype.kickStart = function() {

@@ -268,11 +268,6 @@ var backup = function() {
 
 var backupTimeout = setTimeout(backup, 3000);
 
-sound.onReady = function() { // ugly
-    return 0;
-    clearInterval(backupTimeout);
-    main();
-};
 showMessage('loading sound');
 sound.load();
 

@@ -3,6 +3,7 @@ function Sound() {
     this.coinAudio = 0;
     this.shineAppearsAudio = 0;
     this.mamaMiaAudio = 0;
+    this.ready = 0;
     this.onReady = function() {};
 }
 
@@ -16,6 +17,7 @@ Sound.prototype.load = function() {
     var areYouReady = function() {
 	sayYes ++;
 	if (sayYes >= audioCount) {
+	    that.ready = 1;
 	    that.onReady();
 	}
     };
