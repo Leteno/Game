@@ -174,6 +174,22 @@ Board.prototype.switchToGamingState = function() {
     this.state = this.STATE_GAMING;
 };
 
+var pickupProperColor = function() {
+    var _colorIndex = 0;
+    var colorShop = [
+	'#4d3d9bf5',
+	'#7D8C91',
+	'#b37700',
+	'#93C199',
+	'#009B4E',
+	'#98A89A',
+	'#5868D1'
+    ];
+    return function() {
+	return colorShop[_colorIndex++ % colorShop.length];
+    };
+}();
+
 Board.prototype.createSwapAnimation = function(row1, col1, row2, col2) {
     var shape1 = this.getShape(row1, col1);
     var shape2 = this.getShape(row2, col2);
@@ -182,16 +198,21 @@ Board.prototype.createSwapAnimation = function(row1, col1, row2, col2) {
     }
 
     console.log('swaping', row1, col1, 'to', row2, col2);
+
     shape1.setMoving(1);
     shape2.setMoving(1);
     var that = this;
+    var onBegin = function() {
+	var color = pickupProperColor();
+	shape1.movingColor = shape2.movingColor = color;
+    };
     var onSuccess = function() {
 	var index1 = that.getIndexOfShape(shape1);
 	var index2 = that.getIndexOfShape(shape2);
 	that.matrix[index1] = shape2;
 	that.matrix[index2] = shape1;
     };
-    return new Swap(shape1, shape2, onSuccess);
+    return new Swap(shape1, shape2, onBegin, onSuccess);
 };
 
 Board.prototype.isAvaliable = function(row, col) {
@@ -218,7 +239,7 @@ Board.prototype.clearAnimations = function() {
 };
 
 // speed is pixel per 0.1s
-function Swap(shape1, shape2, onSuccess, speed=10) {
+function Swap(shape1, shape2, onBegin, onSuccess, speed=10) {
     this.shape1 = shape1;
     this.shape2 = shape2;
 
@@ -228,7 +249,8 @@ function Swap(shape1, shape2, onSuccess, speed=10) {
     this.y2 = shape2.py;
 
     this.begin = 0;
-    this.onSuccess = onSuccess;;
+    this.onBegin = onBegin;
+    this.onSuccess = onSuccess;
 
     var deltaX = Math.abs(this.x1 - this.x2);
     var deltaY = Math.abs(this.y1 - this.y2);
@@ -247,6 +269,9 @@ Swap.prototype.run = function() {
     var currentTime = new Date().getTime();
     if (!this.begin) {
 	this.begin = currentTime;
+	if (isFunction(this.onBegin)) {
+	    this.onBegin();
+	}
     }
 
     var elapsing = currentTime - this.begin;

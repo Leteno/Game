@@ -23,6 +23,7 @@ function Shape(px, py, size, type) {
     this.type = type;
 
     this.moving = 0;
+    this.movingColor = 0;
 }
 
 Shape.prototype.draw = function(ctx) {
@@ -33,7 +34,7 @@ Shape.prototype.draw = function(ctx) {
 
     if (this.hide) {
 	ctx.save();
-	ctx.fillStyle = 'blue'
+	ctx.fillStyle = this.moving && this.movingColor ? this.movingColor : 'blue';
 	ctx.fillRect(x, y, currentSize, currentSize);
 	ctx.restore();
     } else {
