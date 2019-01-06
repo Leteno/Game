@@ -253,6 +253,7 @@ function onWrongItemPick(item) {
     if (wrongAnswer % 5 == 2) {
 	help.serveOnce();
     }
+    sound.playMamaMia();
 }
 
 var backup = function() {
@@ -263,13 +264,9 @@ var backup = function() {
 
 var backupTimeout = setTimeout(backup, 2000);
 
-var yes = 0;
 sound.onReady = function() { // ugly
-    yes ++;
-    if (yes >= 2) {
-	clearInterval(backupTimeout);
-	main();
-    }
+    clearInterval(backupTimeout);
+    main();
 };
 showMessage('loading sound');
 sound.load();
