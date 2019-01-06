@@ -12,6 +12,8 @@ var canvas = document.getElementById('canvas');
 var reloadBtn = document.getElementById('reload');
 var ctx = canvas.getContext('2d');
 
+var openingUp = new OpeningUp(canvas);
+
 var boardOffsetX;
 var boardOffsetY;
 var chessSize;
@@ -38,6 +40,8 @@ function main() {
     canvas.onclick = onCanvasClick;
 
     onStartPicking();
+
+    openingUp.stop();
 
     raf = requestAnimationFrame(draw);
 }
@@ -262,11 +266,14 @@ var backup = function() {
     main();
 };
 
-var backupTimeout = setTimeout(backup, 2000);
+var backupTimeout = setTimeout(backup, 3000);
 
 sound.onReady = function() { // ugly
+    return 0;
     clearInterval(backupTimeout);
     main();
 };
 showMessage('loading sound');
 sound.load();
+
+openingUp.kickStart();
