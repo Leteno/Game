@@ -45,6 +45,9 @@ Board.prototype.getXY = function(row, col) {
 Board.prototype.getShapeFromXY = function(x, y) {
     var col = Math.floor((x - this.x0) / (this.chessSize + this.gap));
     var row = Math.floor((y - this.y0) / (this.chessSize + this.gap));
+    if (col < 0 || row < 0 || col >= this.n || row >= this.n) {
+	return null;
+    }
     var fromX = this.x0 + col * (this.chessSize + this.gap);
     var fromY = this.y0 + row * (this.chessSize + this.gap);
     var toX = fromX + this.chessSize, toY = fromY + this.chessSize;
@@ -112,7 +115,7 @@ Board.prototype.maskAll = function() {
 Board.prototype.onclick = function(x, y) {
     var shape = this.getShapeFromXY(x, y);
     if (shape === null) {
-	return;
+	return 0;
     }
     if (this.state == this.STATE_SELECTING) {
 	if (shape.selected) {
@@ -236,6 +239,12 @@ Board.prototype.clearAnimations = function() {
     this.extraJobs = [];
     this.mainMessageQueue.clear();
     this.extraMessageQueue.clear();
+};
+
+Board.prototype.cheat = function(bool) {
+    for (var i = 0; i < this.matrix.length; i++) {
+	this.matrix[i].cheat = bool;
+    }
 };
 
 // speed is pixel per 0.1s

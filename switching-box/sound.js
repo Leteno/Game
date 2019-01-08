@@ -5,7 +5,25 @@ function Sound() {
     this.mamaMiaAudio = 0;
     this.ready = 0;
     this.onReady = function() {};
+
+    this.volume = 1;
+
+    var that = this;
+    var mutedCheckbox = document.getElementById('mute_music');
+    mutedCheckbox.onchange = function() {
+	if (mutedCheckbox.checked) {
+	    that.setVolume(0);
+	} else {
+	    that.setVolume(that.volume);
+	}
+    };
 }
+
+Sound.prototype.setVolume = function(vol) {
+    this.coinAudio.volume = vol;
+    this.shineAppearsAudio.volume = vol;
+    this.mamaMiaAudio.volume = vol;
+};
 
 Sound.prototype.load = function() {
     this.coinAudio = new Audio();

@@ -18,6 +18,7 @@ TODO-LIST:
 * [x] increase difficulty in next level
 * [x] swaping speed accelerate
 * [ ] bug on determine position of item (when you touch outside)
+* [ ] Add cheat button, to pass it fast(score minus)
 
 THANKS:
 
