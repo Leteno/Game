@@ -24,6 +24,8 @@ function Shape(px, py, size, type) {
 
     this.moving = 0;
     this.movingColor = 0;
+
+    this.cheat = 0;
 }
 
 Shape.prototype.draw = function(ctx) {
@@ -32,7 +34,7 @@ Shape.prototype.draw = function(ctx) {
     x = this.px;
     y = this.py;
 
-    if (this.hide) {
+    if (this.hide && !this.cheat) {
 	ctx.save();
 	ctx.fillStyle = this.moving && this.movingColor ? this.movingColor : 'blue';
 	ctx.fillRect(x, y, currentSize, currentSize);

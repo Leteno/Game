@@ -241,6 +241,12 @@ Board.prototype.clearAnimations = function() {
     this.extraMessageQueue.clear();
 };
 
+Board.prototype.cheat = function(bool) {
+    for (var i = 0; i < this.matrix.length; i++) {
+	this.matrix[i].cheat = bool;
+    }
+};
+
 // speed is pixel per 0.1s
 function Swap(shape1, shape2, onBegin, onSuccess, speed=10) {
     this.shape1 = shape1;

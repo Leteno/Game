@@ -6,6 +6,7 @@ var sound = new Sound();
 var scoreAndLevelLabel = new ScoreAndLevelLabel(level=0);
 var taskLabel = new Label();
 var hintLabel = new Label();
+var cheatButton = new Button('cheat');
 var difficulty = new Difficulty();;
 
 var canvas = document.getElementById('canvas');
@@ -38,6 +39,8 @@ function main() {
 
     reloadBtn.onclick = onReload;
     canvas.onclick = onCanvasClick;
+    canvas.onmousedown = onCanvasMouseDown;
+    canvas.onmouseup = onCanvasMouseUp;
 
     onStartPicking();
 
@@ -123,6 +126,11 @@ function draw() {
     hintLabel.draw(ctx);
     ctx.restore();
 
+    ctx.save();
+    ctx.translate(cheatButton.x, cheatButton.y);
+    cheatButton.draw(ctx);
+    ctx.restore();
+
     raf = requestAnimationFrame(draw);
 }
 
@@ -136,7 +144,6 @@ function onStartPicking() {
     board.switchToSelectingState();
     board.addAnimation(watchingQueue);
 
-
     if (help) {
 	help.pause();
     }
@@ -146,6 +153,18 @@ function onStartPicking() {
 
     taskLabel.setText('task: ' + count + (count > 0 ? ' items' : ' item'));
     hintLabel.setText('pick ' + count + (count > 0 ? ' items' : ' item'));
+    cheatButton.setXY(canvas.width - 100, 100);
+    cheatButton.onclickRun = function() {
+	console.log('button onclick');
+    };
+    cheatButton.onPressRun = function() {
+	board.cheat(1);
+	scoreAndLevelLabel.score -= Math.max(10, scoreAndLevelLabel.score / 2);
+	scoreAndLevelLabel.updateLabel();
+    };
+    cheatButton.onPressUpRun = function() {
+	board.cheat(0);
+    };
 }
 
 function onStartGaming() {
@@ -215,10 +234,27 @@ function getRandomAvaliableItem() {
 }
 
 function onCanvasClick(event) {
-    if (board.onclick(event.clientX - boardOffsetX - canvas.offsetLeft, event.clientY - boardOffsetY - canvas.offsetTop)) {
+    var realX = event.clientX - canvas.offsetLeft;
+    var realY = event.clientY - canvas.offsetTop;
+    if (board.onclick(realX - boardOffsetX, realY - boardOffsetY)) {
 	// resolve by board
 	return true;
     }
+    if (cheatButton.onclick(realX - cheatButton.x, realY - cheatButton.y)) {
+	return true;
+    }
+}
+
+function onCanvasMouseDown(event) {
+    var realX = event.clientX - canvas.offsetLeft;
+    var realY = event.clientY - canvas.offsetTop;
+    cheatButton.onMouseDown(realX - cheatButton.x, realY - cheatButton.y);
+}
+
+function onCanvasMouseUp(event) {
+    var realX = event.clientX - canvas.offsetLeft;
+    var realY = event.clientY - canvas.offsetTop;
+    cheatButton.onMouseUp(realX - cheatButton.x, realY - cheatButton.y);
 }
 
 function onPickItem() {
