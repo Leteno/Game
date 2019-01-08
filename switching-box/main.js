@@ -215,7 +215,7 @@ function getRandomAvaliableItem() {
 }
 
 function onCanvasClick(event) {
-    if (board.onclick(event.clientX - boardOffsetX, event.clientY - boardOffsetY)) {
+    if (board.onclick(event.clientX - boardOffsetX - canvas.offsetLeft, event.clientY - boardOffsetY - canvas.offsetTop)) {
 	// resolve by board
 	return true;
     }
