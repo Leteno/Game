@@ -3,3 +3,9 @@
 
 # auto gen
 .vscode
+
+# data
+*.dat
+*.html
+*.htm
+*.result
